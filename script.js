@@ -14,16 +14,6 @@ document.getElementById("fileInput").addEventListener("change", function(event) 
   }
 });
 
-function getRemedyFor(label) {
-  const remedies = {
-    "Powdery Mildew": "Use fungicide sprays, ensure proper air circulation.",
-    "Leaf Spot": "Avoid overhead watering, remove infected leaves.",
-    "Blight": "Apply copper-based sprays, crop rotation helps.",
-    "Healthy": "No disease detected. Maintain regular care!"
-  };
-  return remedies[label] || "Follow best agronomic practices and consult local guidance.";
-}
-
 async function predictDisease() {
   const fileInput = document.getElementById("fileInput");
   const predictionEl = document.getElementById("prediction");
