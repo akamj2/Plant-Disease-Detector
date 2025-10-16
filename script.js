@@ -1,5 +1,7 @@
 // --- Configuration ---
 const USE_MOCK = false; // Set to false to use your backend
+// IMPORTANT: This URL will only work if your backend is running on your own computer.
+// It will NOT work on the live Vercel site.
 const BACKEND_URL = "http://127.0.0.1:5000/predict";
 
 // --- Event Listener for Image Preview ---
@@ -15,8 +17,6 @@ document.getElementById("fileInput").addEventListener("change", function(event) 
 });
 
 // --- Event Listener for the Predict Button ---
-// We find the button on the page and tell it to run the
-// predictDisease function when someone clicks it.
 document.querySelector(".upload-section button").addEventListener("click", predictDisease);
 
 
@@ -30,9 +30,6 @@ async function predictDisease() {
     predictionEl.innerText = "Please select an image first.";
     return;
   }
-  
-
-}
 
   // MOCK MODE: Use fake data for frontend testing
   if (USE_MOCK) {
@@ -42,7 +39,7 @@ async function predictDisease() {
     return;
   }
 
-  // LIVE MODE: Check if backend URL is configured in Vercel
+  // LIVE MODE: Check if backend URL is configured
   if (!BACKEND_URL) {
     predictionEl.innerText = "Error: Backend URL is not configured.";
     return;
@@ -96,4 +93,5 @@ async function predictDisease() {
     predictionEl.innerText = `Prediction failed: ${err.message}`;
     console.error("Prediction Error:", err);
   }
+// THE BRACKET NOW CORRECTLY CLOSES THE FUNCTION HERE AT THE END.
 }
