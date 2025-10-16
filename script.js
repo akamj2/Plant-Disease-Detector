@@ -1,11 +1,6 @@
 // --- Configuration ---
-// Set USE_MOCK to 'false' when you are ready to connect to your live backend.
-const USE_MOCK = false;
-
-// Use the environment variable for the backend URL.
-// This will be set in the Vercel dashboard for your live site.
+const USE_MOCK = false; // Set to false to use your backend
 const BACKEND_URL = import.meta.env.VITE_API_BASE_URL;
-
 
 // --- Event Listener for Image Preview ---
 document.getElementById("fileInput").addEventListener("change", function(event) {
@@ -19,6 +14,11 @@ document.getElementById("fileInput").addEventListener("change", function(event) 
   }
 });
 
+// --- Event Listener for the Predict Button ---
+// We find the button on the page and tell it to run the
+// predictDisease function when someone clicks it.
+document.querySelector(".upload-section button").addEventListener("click", predictDisease);
+
 
 // --- Main Prediction Function ---
 async function predictDisease() {
@@ -30,6 +30,9 @@ async function predictDisease() {
     predictionEl.innerText = "Please select an image first.";
     return;
   }
+  
+
+}
 
   // MOCK MODE: Use fake data for frontend testing
   if (USE_MOCK) {
