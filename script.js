@@ -1,6 +1,6 @@
 // --- Configuration ---
 const USE_MOCK = false; // Set to false to use your backend
-const BACKEND_URL = import.meta.env.VITE_API_BASE_URL;
+const BACKEND_URL = http://127.0.0.1:5000/predict;
 
 // --- Event Listener for Image Preview ---
 document.getElementById("fileInput").addEventListener("change", function(event) {
