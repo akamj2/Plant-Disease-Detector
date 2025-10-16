@@ -1,6 +1,6 @@
 // --- Configuration ---
 // Set USE_MOCK to 'false' when you are ready to connect to your live backend.
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 // Use the environment variable for the backend URL.
 // This will be set in the Vercel dashboard for your live site.
