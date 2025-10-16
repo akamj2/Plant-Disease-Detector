@@ -1,8 +1,13 @@
-// Configuration flags
-const USE_MOCK = true; // Set to false to use backend API
-const BACKEND_URL = ""; // e.g., "http://localhost:8000/predict"
+// --- Configuration ---
+// Set USE_MOCK to 'false' when you are ready to connect to your live backend.
+const USE_MOCK = true;
 
-// Preview uploaded image
+// Use the environment variable for the backend URL.
+// This will be set in the Vercel dashboard for your live site.
+const BACKEND_URL = import.meta.env.VITE_API_BASE_URL;
+
+
+// --- Event Listener for Image Preview ---
 document.getElementById("fileInput").addEventListener("change", function(event) {
   const file = event.target.files[0];
   if (file) {
@@ -14,79 +19,78 @@ document.getElementById("fileInput").addEventListener("change", function(event) 
   }
 });
 
+
+// --- Main Prediction Function ---
 async function predictDisease() {
   const fileInput = document.getElementById("fileInput");
   const predictionEl = document.getElementById("prediction");
-  const remediesEl = document.getElementById("remedies");
 
+  // Check if a file was selected
   if (!fileInput.files || !fileInput.files[0]) {
-    predictionEl.innerText = "Please select an image first";
-    remediesEl.innerText = "";
+    predictionEl.innerText = "Please select an image first.";
     return;
   }
 
+  // MOCK MODE: Use fake data for frontend testing
   if (USE_MOCK) {
     const labels = ["Powdery Mildew", "Leaf Spot", "Blight", "Healthy"];
     const label = labels[Math.floor(Math.random() * labels.length)];
-    predictionEl.innerText = label;
-    remediesEl.innerText = getRemedyFor(label);
+    predictionEl.innerText = `Prediction: ${label}`;
     return;
   }
 
+  // LIVE MODE: Check if backend URL is configured in Vercel
   if (!BACKEND_URL) {
-    predictionEl.innerText = "Backend URL not configured";
-    remediesEl.innerText = "Set BACKEND_URL in script.js";
+    predictionEl.innerText = "Error: Backend URL is not configured.";
     return;
   }
 
+  // --- API Call Logic ---
   try {
-    predictionEl.innerText = "Predicting...";
-    remediesEl.innerText = "";
+    predictionEl.innerText = "Analyzing leaf...";
 
     const formData = new FormData();
     formData.append("file", fileInput.files[0]);
 
+    // Fetch prediction from the backend API
     const response = await fetch(BACKEND_URL, {
       method: "POST",
       body: formData
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      throw new Error(`Server responded with status: ${response.status}`);
     }
 
     const data = await response.json();
 
-    // Normalize various response shapes (A, B, C from README)
+    // The following code tries to find the disease label from various possible API response formats.
     let label = "";
     let probability = undefined;
 
     if (Array.isArray(data?.predictions) && data.predictions.length > 0) {
-      // Shape A
       label = data.predictions[0].label;
       probability = data.predictions[0].probability;
     } else if (Array.isArray(data?.top_k) && data.top_k.length > 0) {
-      // Shape B
       label = data.top_k[0];
       probability = Array.isArray(data.probs) ? data.probs[0] : undefined;
     } else if (typeof data?.class === "string") {
-      // Shape C
       label = data.class;
       probability = typeof data.confidence === "number" ? data.confidence / 100 : undefined;
     } else if (typeof data?.label === "string") {
-      // Fallback common shape
       label = data.label;
       probability = data.probability;
     } else {
-      throw new Error("Unrecognized response format");
+      throw new Error("Could not understand the response format from the server.");
     }
 
+    // Display the final prediction
     const probText = typeof probability === "number" ? ` (${Math.round(probability * 100)}%)` : "";
     predictionEl.innerText = `${label}${probText}`;
-    remediesEl.innerText = getRemedyFor(label);
+
   } catch (err) {
-    predictionEl.innerText = "Prediction failed";
-    remediesEl.innerText = String(err);
-    console.error(err);
+    // Display any errors that happen during the API call
+    predictionEl.innerText = `Prediction failed: ${err.message}`;
+    console.error("Prediction Error:", err);
   }
 }
